@@ -23,12 +23,14 @@
 </head>
 <body>
     <div id="video-container">
-        <video id="video" autoplay controls></video>
+        <!-- Corrected the ID to match the initialization in JavaScript -->
+        <video id="video" class="video-js" autoplay controls></video>
         <div id="video-description">Description goes here</div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         function getUrlParameterCheck(name, url) {
-            var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
+            var startIndex = url.indexOf('https://goddardduncan.github.io/tvcast/') + 'https://goddardduncan.github.io/tvcast/'.length;
             return url.slice(startIndex);
         }
 
@@ -43,13 +45,14 @@
         var url = window.location.href;
         var urlParameterCheck = getUrlParameterCheck('url', url);
 
-	var player = videojs('my_video', {
+        // Corrected the player initialization ID
+        var player = videojs('video', {
             plugins: {
                 chromecast: {
                     appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
                     metadata: {
                         title: 'Live Stream',
-                        subtitle: 'SBS Food Channel',
+                        subtitle: 'DGapp',
                     }
                 }
             }
@@ -68,13 +71,18 @@
             });
         }
 
+        // Corrected the video element reference for HLS.js
         if (Hls.isSupported() && urlParameter) {
-            var video = document.getElementById('my_video_html5_api');
+            var video = document.getElementById('video'); // Use the corrected ID
             var hls = new Hls();
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, function() {
                 video.play();
+            });
+            // Error handling example
+            hls.on(Hls.Events.ERROR, function(event, data) {
+                console.error('HLS error:', data);
             });
         }
     </script>
