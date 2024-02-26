@@ -77,8 +77,7 @@
             var hls = new Hls();
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
+            
             });
             // Error handling example
             hls.on(Hls.Events.ERROR, function(event, data) {
