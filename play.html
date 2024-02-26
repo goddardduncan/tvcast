@@ -23,56 +23,64 @@
 </head>
 <body>
     <div id="video-container">
-        <video id="video" class="video-js" autoplay controls></video>
+        <video id="video" class="video-js" controls></video>
         <div id="video-description">Description goes here</div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+            if (isAvailable) {
+                initializePlayerAndCast();
+            } else {
+                console.error("Chromecast API is not available.");
+            }
+        };
+
+        function initializePlayerAndCast() {
+            // Initialize the Video.js player with Chromecast support
+            var player = videojs('video', {
+                plugins: {
+                    chromecast: {
+                        appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                        metadata: {
+                            title: 'Live Stream',
+                            subtitle: 'DGapp',
+                        }
+                    }
+                }
+            });
+
+            // Set up Chromecast
+            cast.framework.CastContext.getInstance().setOptions({
+                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+            });
+
+            // Load video using HLS.js if supported and URL parameter is provided
+            loadVideoWithHls();
+        }
+
+        function loadVideoWithHls() {
+            var urlParameter = getUrlParameter('url');
+            if (Hls.isSupported() && urlParameter) {
+                var video = document.getElementById('video').querySelector('video');
+                var hls = new Hls();
+                hls.loadSource(urlParameter);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    console.error('HLS error:', data);
+                });
+            }
+        }
+
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-
-        var urlParameter = getUrlParameter('url');
-
-        var player = videojs('video', {
-            plugins: {
-                chromecast: {
-                    appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                    metadata: {
-                        title: 'Live Stream',
-                        subtitle: 'DGapp',
-                    }
-                }
-            }
-        });
-
-        window['__onGCastApiAvailable'] = function(isAvailable) {
-            if (isAvailable) {
-                initializeCastApi();
-            }
-        };
-
-        function initializeCastApi() {
-            cast.framework.CastContext.getInstance().setOptions({
-                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-            });
-        }
-
-        if (Hls.isSupported() && urlParameter) {
-            var video = document.getElementById('video'); // Corrected ID
-            var hls = new Hls();
-            hls.loadSource(urlParameter);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
-            hls.on(Hls.Events.ERROR, function(event, data) {
-                console.error('HLS error:', data);
-            });
         }
     </script>
 </body>
