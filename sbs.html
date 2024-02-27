@@ -14,15 +14,10 @@
             margin: 0;
             padding: 0;
             background-color: #000;
-            display: flex; /* Flexbox layout */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            overflow: hidden; /* Hide scrollbars */
         }
         video {
-            max-width: 100%; /* Limit width */
-            max-height: 100%; /* Limit height */
-            object-fit: cover; /* Cover the whole area without losing aspect ratio */
+            width: 100%; /* Full width */
+            height: auto; /* Maintain aspect ratio */
         }
     </style>
 </head>
@@ -67,22 +62,21 @@
             });
         }
 
-        // Adjust video size based on orientation
-        function adjustVideoSize() {
-            var videoElement = document.getElementById('my_video');
-            if (window.innerHeight > window.innerWidth) {
-                // Portrait
-                videoElement.style.maxWidth = "100%";
-                videoElement.style.maxHeight = "100%";
-            } else {
-                // Landscape
-                videoElement.style.width = "100vw";
-                videoElement.style.height = "100vh";
+        // Fullscreen code
+        function toggleFullScreen() {
+            var video = document.getElementById('my_video');
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.mozRequestFullScreen) { /* Firefox */
+                video.mozRequestFullScreen();
+            } else if (video.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                video.webkitRequestFullscreen();
+            } else if (video.msRequestFullscreen) { /* IE/Edge */
+                video.msRequestFullscreen();
             }
         }
 
-        window.addEventListener('resize', adjustVideoSize);
-        window.addEventListener('DOMContentLoaded', adjustVideoSize); // Adjust size on load
+        window.addEventListener('load', toggleFullScreen);
     </script>
 </body>
 </html>
