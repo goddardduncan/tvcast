@@ -8,9 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/video.js/dist/video.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.js"></script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-    <script>
-    var playerurl = 'https://i.mjh.nz/sbs.m3u8'  
-    </script>
     <style>
         body, html {
             height: 100%;
@@ -26,7 +23,7 @@
 </head>
 <body>
     <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
-        <source src=playerurl type="application/x-mpegURL">
+        <source src="https://i.mjh.nz/sbs.m3u8" type="application/x-mpegURL">
     </video>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
@@ -58,7 +55,7 @@
         if (Hls.isSupported()) {
             var video = document.getElementById('my_video_html5_api');
             var hls = new Hls();
-            //hls.loadSource(playerurl);
+            hls.loadSource('https://i.mjh.nz/sbs.m3u8');
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, function() {
                 video.play();
