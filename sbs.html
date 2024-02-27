@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HLS Player with Chromecast Support</title>
-    <link href="https://cdn.jsdelivr.net/npm/video.js/dist/video-js.min.css" rel="stylesheet">
+    //<link href="https://cdn.jsdelivr.net/npm/video.js/dist/video-js.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/video.js/dist/video.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.js"></script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
@@ -14,25 +14,15 @@
             margin: 0;
             padding: 0;
             background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         video {
-            max-width: 100%;
-            max-height: 100vh;
-            object-fit: cover;
-        }
-        @media (orientation: landscape) {
-            video {
-                width: 100vw;
-                height: auto;
-            }
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" playsinline>
+    <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
         <source src="https://i.mjh.nz/sbs.m3u8" type="application/x-mpegURL">
     </video>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -71,19 +61,6 @@
                 video.play();
             });
         }
-
-        // Optional: Add event listener for double click to toggle fullscreen
-        document.getElementById('my_video').addEventListener('dblclick', function() {
-            if (!document.fullscreenElement) {
-                if (this.requestFullscreen) {
-                    this.requestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        });
     </script>
 </body>
 </html>
