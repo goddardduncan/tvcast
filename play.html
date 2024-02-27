@@ -25,7 +25,6 @@
     <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
         <!-- Source tag removed -->
     </video>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         window['__onGCastApiAvailable'] = function(isAvailable) {
             if (isAvailable) {
@@ -54,9 +53,7 @@
                 }
             });
 
-            var videoSourceUrl = getUrlParameter('url') || 'your_default_video_url_here.m3u8';
-
-            
+            var videoSourceUrl = getUrlParameter('url');
         }
 
         // Wait for the Chromecast API to be available before initializing the player
