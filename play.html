@@ -23,12 +23,10 @@
 </head>
 <body>
     <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
-        <!-- Source tag removed -->
+        <!-- Source tag removed for clarity -->
     </video>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        
-
         window['__onGCastApiAvailable'] = function(isAvailable) {
             if (isAvailable) {
                 initializeCastApi();
@@ -41,7 +39,8 @@
                 autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
             });
         }
-	var player = videojs('my_video', {
+
+        var player = videojs('my_video', {
             plugins: {
                 chromecast: {
                     appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
@@ -52,37 +51,66 @@
                 }
             }
         });
-        // Define your video source URL here
-        function getUrlParameterCheck(name, url) {
-            var startIndex = url.indexOf('https://goddardduncan.github.io/tvcast/') + 'https://goddardduncan.github.io/tvcast/'.length;
-            return url.slice(startIndex);
+
+        function loadMediaWithRetry(url, maxRetries = 3, retryDelay = 2000, currentAttempt = 0) {
+            var video = document.getElementById('my_video_html5_api') || document.getElementById('my_video');
+
+            if (currentAttempt < maxRetries) {
+                if (Hls.isSupported()) {
+                    var hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(() => {
+                            setTimeout(() => {
+                                loadMediaWithRetry(url, maxRetries, retryDelay, currentAttempt + 1);
+                            }, retryDelay);
+                        });
+                    });
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        if(data.fatal) {
+                            switch(data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    // try to recover network error
+                                    console.error('fatal network error encountered, try to recover');
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error('fatal media error encountered, try to recover');
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    // cannot recover
+                                    hls.destroy();
+                                    setTimeout(() => {
+                                        loadMediaWithRetry(url, maxRetries, retryDelay, currentAttempt + 1);
+                                    }, retryDelay);
+                                    break;
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.play().catch(() => {
+                        setTimeout(() => {
+                            loadMediaWithRetry(url, maxRetries, retryDelay, currentAttempt + 1);
+                        }, retryDelay);
+                    });
+                }
+            } else {
+                console.error('Max retries reached. Unable to load the media.');
+            }
         }
 
         function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            name = name.replace(/[\[\]]/g, '\\$&');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
 
         var videoSourceUrl = getUrlParameter('url');
-
-        if (Hls.isSupported()) {
-            var video = document.getElementById('my_video').getElementsByTagName('video')[0];
-            var hls = new Hls();
-            hls.loadSource(videoSourceUrl); // Use the variable here
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
-        } else {
-            // Directly set the source for browsers that support HLS natively (e.g., Safari)
-            var video = document.getElementById('my_video');
-            video.src = videoSourceUrl; // Use the variable here
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
-            });
-        }
+        loadMediaWithRetry(videoSourceUrl);
     </script>
 </body>
 </html>
