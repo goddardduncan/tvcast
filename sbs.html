@@ -58,7 +58,7 @@
         if (Hls.isSupported()) {
             var video = document.getElementById('my_video_html5_api');
             var hls = new Hls();
-            hls.loadSource(playerurl);
+            //hls.loadSource(playerurl);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, function() {
                 video.play();
