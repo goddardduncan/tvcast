@@ -27,18 +27,6 @@
     </video>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        var player = videojs('my_video', {
-            plugins: {
-                chromecast: {
-                    appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                    metadata: {
-                        title: 'Live Stream',
-                        subtitle: 'Dg',
-                    }
-                }
-            }
-        });
-
         window['__onGCastApiAvailable'] = function(isAvailable) {
             if (isAvailable) {
                 initializeCastApi();
@@ -52,37 +40,45 @@
             });
         }
 
-        // Define your video source URL here
-        function getUrlParameterCheck(name, url) {
-            var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
-            return url.slice(startIndex);
-        }
-
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-
-        var videoSourceUrl = getUrlParameter('url');
-
-        if (Hls.isSupported()) {
-            var video = document.getElementById('my_video').getElementsByTagName('video')[0];
-            var hls = new Hls();
-            hls.loadSource(videoSourceUrl); // Use the variable here
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
+        // This should be moved inside a function or a condition that ensures Chromecast is ready
+        function initializeVideoPlayer() {
+            var player = videojs('my_video', {
+                plugins: {
+                    chromecast: {
+                        appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                        metadata: {
+                            title: 'Live Stream',
+                            subtitle: 'Dg',
+                        }
+                    }
+                }
             });
-        } else {
-            // Directly set the source for browsers that support HLS natively (e.g., Safari)
-            var video = document.getElementById('my_video');
-            video.src = videoSourceUrl; // Use the variable here
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
-            });
+
+            var videoSourceUrl = getUrlParameter('url') || 'your_default_video_url_here.m3u8';
+
+            if (Hls.isSupported()) {
+                var video = document.getElementById('my_video_html5_api'); // Correct ID for Video.js video element
+                var hls = new Hls();
+                hls.loadSource(videoSourceUrl); // Use the variable here
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSourceUrl;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
         }
+
+        // Wait for the Chromecast API to be available before initializing the player
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+            if (isAvailable) {
+                initializeCastApi();
+                initializeVideoPlayer(); // Now initialize the player
+            }
+        };
     </script>
 </body>
 </html>
