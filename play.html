@@ -52,25 +52,6 @@
                 autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
             });
         }
-
-        
-
-        if (Hls.isSupported()) {
-            var video = document.getElementById('my_video').getElementsByTagName('video')[0];
-            var hls = new Hls();
-            hls.loadSource(videoSourceUrl); // Use the variable here
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
-        } else {
-            // Directly set the source for browsers that support HLS natively (e.g., Safari)
-            var video = document.getElementById('my_video');
-            video.src = videoSourceUrl; // Use the variable here
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
-            });
-        }
     </script>
 </body>
 </html>
