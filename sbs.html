@@ -14,10 +14,15 @@
             margin: 0;
             padding: 0;
             background-color: #000;
+            display: flex; /* Flexbox layout */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            overflow: hidden; /* Hide scrollbars */
         }
         video {
-            width: 100%;
-            height: auto;
+            max-width: 100%; /* Limit width */
+            max-height: 100%; /* Limit height */
+            object-fit: cover; /* Cover the whole area without losing aspect ratio */
         }
     </style>
 </head>
@@ -61,6 +66,23 @@
                 video.play();
             });
         }
+
+        // Adjust video size based on orientation
+        function adjustVideoSize() {
+            var videoElement = document.getElementById('my_video');
+            if (window.innerHeight > window.innerWidth) {
+                // Portrait
+                videoElement.style.maxWidth = "100%";
+                videoElement.style.maxHeight = "100%";
+            } else {
+                // Landscape
+                videoElement.style.width = "100vw";
+                videoElement.style.height = "100vh";
+            }
+        }
+
+        window.addEventListener('resize', adjustVideoSize);
+        window.addEventListener('DOMContentLoaded', adjustVideoSize); // Adjust size on load
     </script>
 </body>
 </html>
