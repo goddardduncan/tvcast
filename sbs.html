@@ -14,15 +14,25 @@
             margin: 0;
             padding: 0;
             background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         video {
-            width: 100%; /* Full width */
-            height: auto; /* Maintain aspect ratio */
+            max-width: 100%;
+            max-height: 100vh;
+            object-fit: cover;
+        }
+        @media (orientation: landscape) {
+            video {
+                width: 100vw;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
+    <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" playsinline>
         <source src="https://i.mjh.nz/sbs.m3u8" type="application/x-mpegURL">
     </video>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -62,21 +72,18 @@
             });
         }
 
-        // Fullscreen code
-        function toggleFullScreen() {
-            var video = document.getElementById('my_video');
-            if (video.requestFullscreen) {
-                video.requestFullscreen();
-            } else if (video.mozRequestFullScreen) { /* Firefox */
-                video.mozRequestFullScreen();
-            } else if (video.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-                video.webkitRequestFullscreen();
-            } else if (video.msRequestFullscreen) { /* IE/Edge */
-                video.msRequestFullscreen();
+        // Optional: Add event listener for double click to toggle fullscreen
+        document.getElementById('my_video').addEventListener('dblclick', function() {
+            if (!document.fullscreenElement) {
+                if (this.requestFullscreen) {
+                    this.requestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
             }
-        }
-
-        window.addEventListener('load', toggleFullScreen);
+        });
     </script>
 </body>
 </html>
